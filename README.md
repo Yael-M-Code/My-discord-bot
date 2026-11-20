@@ -1,7 +1,8 @@
 # My-discord-bot
 ## Tutorial
 ### Make the bot join your server
-[https://discord.com/oauth2/authorize?client_id=1573044252684849242&permissions=8&integration_type=0&scope=bot+applications.commands](#make-the-bot-join-your-server).
+[Invite the bot to your server](https://discord.com/oauth2/authorize?client_id=1573044252684849242&permissions=8&integration_type=0&scope=bot+applications.commands)
+
 
 ## Documentation The Ring
 > [!WARNING]
