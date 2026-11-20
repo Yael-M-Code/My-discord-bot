@@ -91,35 +91,114 @@ async def delete(ctx, number: int):
     await ctx.channel.purge(limit=number+1)
     await ctx.respond(f"✅ All good, {number} messages has been deleted here <@{ctx.author.id}>", ephemeral=True)
 
+info = bot.create_group("info", "All commands about finding info on everything")
+@info.command(name="avatar", description="See the avatar of someone")
+@discord.option("member", discord.Member, description="choose who you want to see the avatar, by default: YOU", required=False)
+async def avatar(ctx, member: discord.Member):
+    member = member or ctx.author
+    embed = discord.Embed(color=member.color)
+    embed.set_image(url=member.display_avatar.url)
+    await ctx.respond(embed=embed)
+
+@info.command(name="pong", description="Check the ping of the bot")
+async def pong(ctx):
+    ping = round(bot.latency * 1000)
+    await ctx.respond(f"🧰 The ping is **{ping} ms**")
+
+@info.command(name="server", description="Display some infos about the server you're in")
+@discord.guild_only()
+async def server(ctx):
+    guild = ctx.guild
+    bots = 0
+    for i in guild.members:
+        if i.bot == True:
+            bots += 1
+    humans = guild.member_count - bots
+    embed = discord.Embed(title=f"Information about **{guild.name}** ", description=guild.description, color=discord.Color.blurple())
+    owner: str
+    if guild.owner:
+        owner = guild.owner
+    else:
+        owner="Unknown"
+    embed.add_field(name="Owner", value=owner, inline=True)
+    embed.add_field(name="Created on", value=f"<t:{int(guild.created_at.timestamp())}:D>", inline=True) #I just learn that <t...:D> shows the date and time in the user own language format
+    embed.add_field(name="ID", value=f"`{guild.id}`", inline=True)
+    embed.add_field(name="Members", value=f"👨🏻‍🌾 Humans: {humans}, 🤖 Bots: {bots}")
+    embed.add_field(name="Channels", value=f"💬 {len(guild.text_channels)} texts channel\n🔊 {len(guild.voice_channels)} voices channel", inline=True)
+
+    if guild.icon :
+        embed.set_thumbnail(url=guild.icon.url)
+    await ctx.respond(embed=embed)
+
+@info.command(name="user", description="Display some infos about a member")
+@discord.option("member", discord.Member, description="Choose the source of the infos, by default YOU", required=False)
+@discord.guild_only()
+async def user(ctx, member: discord.Member):
+    member = member or ctx.author
+    roles = [role.mention for role in member.roles if role != ctx.guild.default_role]
+    bot: str
+    if member.bot:
+        bot = "🤖 yes !"
+    
+    else:
+        bot = "❌ No !"
+
+    embed = discord.Embed(title=f"Infos about {member.display_name}", color=member.color)
+    embed.add_field(name="ID", value=f"The value is {member.id}", inline=True)
+    embed.add_field(name="Bot?", value=bot, inline=True)
+    embed.add_field(name="Created", value=f"<t:{int(member.created_at.timestamp())}:D>", inline=False)
+    embed.add_field(name="Join", value=f"<t:{int(member.joined_at.timestamp())}:D>", inline=True)
+    embed.add_field(name="Highest role", value=member.top_role.mention, inline=True)
+    embed.add_field(name=f"Roles ({len(roles)})", value=" ".join(roles)[:1024] if roles else "No roles", inline=False) #1024 is the maximum characters in an embed (thanks the doc haha)
 
 
+    if member.timed_out:
+        embed.add_field(name="Muted until...", value=f"<t:{int(member.communication_disabled_until.timestamp())}:R>", inline=False)
+    embed.set_thumbnail(url=member.display_avatar.url)
+    await ctx.respond(embed=embed)
 
 
 
 
 # Event Part
-@bot.event
+#@bot.event
 
 #async def on_member_join(member):
 #    welcomeRoom = member.guild.system_channel
 #    embed = discord.Embed(title="A plane just land 🛩️", description="You saw that, an embed !", color=discord.Color.blurple())
 #    embed.add_field(value=f"Welcome here {member.mention}, here is some information about your invitation:...")
-#
-# 
 #    used = invite
-#    embed.add_field(name="You come from", value=f"https://discord.gg/ {discord.used.code}", inline=True)
+#    embed.add_field(name="You come from", value=f"https://discord.gg/"+{discord.used.code}, inline=True)
 #    embed.add_field(name="Link made by", value=f"{discord.used(inviter)}, thank you!", inline=True)
 #    embed.add_field(name="That have ", value=f"{discord.used(uses)} invites on this server!", inline=True)
 #
-#    embed.set_thumbnail(url=member.display_avatar.url)
+#   embed.set_thumbnail(url=member.display_avatar.url)
 #    await welcomeRoom.send(embed=embed)
 
-
+@bot.event
 async def on_ready():
     ping = round(bot.latency * 1000)
     channel = bot.get_channel(1573272525234774126)
     await channel.send(f"I'm __*ready*__ and __*online*__ with a latence of **{ping} ms** ")
-    
+
+greetings = {"hi", "hii", "hai", "haii", "hello", "helloo", "hey", "heyy"}
+how_are_you = {"how are you", "how are u", "how r u", "how u", "how r you"}
+n_words = {"crap", "bloody", "arse", "ass", "shit", "bitch", "bastard", "piss", "bollocks", "fuck", "motherfucker", "cunt", "cock", "dick"}
+
+@bot.event
+async def on_message(message):
+    if message.author.bot:
+        return
+
+    content = message.content.lower().strip(" !?.,")
+    if content in greetings:
+        await message.reply(f"Hi {message.author.mention} 👋")
+    elif content in how_are_you:
+        await message.reply("I'm doing great, thanks for asking! And you?")
+    elif content in n_words:
+        await message.delete()
+        await message.author.send("it seems like you sad a word that you shouldn't said, it's ok for this time but if you continue a moderator will punish you...")
+        await message.reply("This is really bad what you are doing, please stop")
 
 
 
