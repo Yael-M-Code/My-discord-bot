@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 load_dotenv("token.env") # load all the variables from the env file
 bot = discord.Bot(intents=discord.Intents.all())
 token = os.getenv("TOKEN")
+banlog = {}
 
 # Command Part
 
@@ -17,16 +18,41 @@ async def presentation(ctx):
     embed.set_footer(text="If you are reading that, I hope you will pass a great day")
     await ctx.respond(embed=embed)
 
+@bot.slash_command(name="ban_log", description="shows the log of banned people")
+async def ban_log(ctx):
+    await ctx.respond(banlog)
 
 moderation = bot.create_group("moderation", "All commands to moderate your server")
-@moderation.command(name="ban", description="Ban a member, THIS ACTION IS IMPORTANT, to unban: /unban")
+@moderation.command(name="ban", description="Ban a member, THIS ACTION IS IMPORTANT")
 @discord.option("member", discord.Member, description="The person who will be banned", required=True)
 @discord.option("reason", str, description="Explain why youu want to ban this user", default="No reason given")
 @discord.default_permissions(ban_members=True)
 async def ban(ctx, member: discord.Member, reason: str):
-    await ctx.respond(f"🔍 I'm trying to ban *{member}*")
+    await ctx.respond(f"🔍 I'm trying to ban *{member}* with this id: `{member.id}`")
     await member.ban(reason=reason)
     await ctx.respond(f"✅ All good, **{member}** is banned")
+    banlog[member.id] = {
+        "name": str(member),
+        "reason": reason,
+        "moderator": str(ctx.author),
+    }
+@moderation.command(name="unban", description="Unban a member")
+@discord.option("member_id", str, description="The id of the account that need to be UNBAN", required=True,)
+@discord.option("reason", str, description="Why you want to UNBAN?", default="No reason given")
+async def unban(ctx, member_id: str, reason: str):
+    try: 
+        user = discord.Object(id=int(member_id))
+        await ctx.respond("🔍 Searching the user to unban")
+        await ctx.guild.unban(user, reason=reason)
+        await ctx.respond(f"✅ All good, <@{member_id}> is unban, because: {reason}")
+    except ValueError:
+        await ctx.respond("❌ This is not a valid ID, it must only contain numbers. You can find the id with /ban_log")
+    except discord.NotFound:
+        await ctx.respond("❌ This user is not banned.")
+
+
+
+
 
 
 # Event Part
