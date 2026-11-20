@@ -1,6 +1,7 @@
 import discord
 import os # default module
 from dotenv import load_dotenv
+from datetime import timedelta
 
 load_dotenv("token.env") # load all the variables from the env file
 bot = discord.Bot(intents=discord.Intents.all())
@@ -26,12 +27,12 @@ async def ban_log(ctx):
 moderation = bot.create_group("moderation", "All commands to moderate your server")
 @moderation.command(name="ban", description="Ban a member, THIS ACTION IS IMPORTANT")
 @discord.option("member", discord.Member, description="The person who will be banned", required=True)
-@discord.option("reason", str, description="Explain why youu want to ban this user", default="No reason given")
+@discord.option("reason", str, description="Explain why you want to ban this user", default="No reason given")
 @discord.default_permissions(ban_members=True)
 async def ban(ctx, member: discord.Member, reason: str):
-    await ctx.respond(f"🔍 I'm trying to ban *{member}* with this id: `{member.id}`")
+    await ctx.respond(f"🔍 I'm trying to ban *{member}* with this id: `{member.id}`...")
     await member.ban(reason=reason)
-    await ctx.respond(f"✅ All good, **{member}** is banned by *{ctx.author}*, because: {reason}")
+    await ctx.respond(f"✅ All good, **{member}** is banned by *{ctx.author.name}*, because: {reason}")
     banlog[member.id] = {
         "name": str(member),
         "reason": reason,
@@ -42,12 +43,13 @@ async def ban(ctx, member: discord.Member, reason: str):
 @moderation.command(name="unban", description="Unban a member")
 @discord.option("member_id", str, description="The id of the account that need to be UNBAN", required=True,)
 @discord.option("reason", str, description="Why you want to UNBAN?", default="No reason given")
+@discord.default_permissions(ban_members=True) 
 async def unban(ctx, member_id: str, reason: str):
     try: 
         user = discord.Object(id=int(member_id))
-        await ctx.respond("🔍 Searching the user to unban")
+        await ctx.respond("🔍 Searching the user to unban...")
         await ctx.guild.unban(user, reason=reason)
-        await ctx.respond(f"✅ All good, <@{member_id}> is unban by *{ctx.author}*, because: {reason}")
+        await ctx.respond(f"✅ All good, <@{member_id}> is unban by *{ctx.author.name}*, because: {reason}")
     except ValueError:
         await ctx.respond("❌ This is not a valid ID, it must only contain numbers. You can find the id with /ban_log")
     except discord.NotFound:
@@ -56,10 +58,39 @@ async def unban(ctx, member_id: str, reason: str):
 @moderation.command(name="kick", description="kick the member out of the server")
 @discord.option("member", discord.Member, description="id of the member you want to kick", required=True)
 @discord.option("reason", str, description="why you want to kick him?", default="No reason given")
+@discord.default_permissions(kick_members=True)  
 async def kick(ctx, member: discord.Member, reason: str):
-    await ctx.respond(f"🔍 I'm trying to kick <@{member.id}>")
+    await ctx.respond(f"🔍 I'm trying to kick <@{member.id}>...")
     await member.kick(reason=reason)
-    await ctx.respond(f"✅ All good, **{member}** has been kicked out by *{ctx.author}* because: *{reason}*")
+    await ctx.respond(f"✅ All good, **{member}** has been kicked out by *{ctx.author.name}* because: *{reason}*")
+
+@moderation.command(name="mute", description="mute someone in the chat")
+@discord.option("member", discord.Member, description="choose the member you want to mute", required=True)
+@discord.option("time", int, description="what will be the duration of the mute (IN MINUTES)", required=True)
+@discord.option("reason", str, description="why do you want to mute this member", default="No reason given")
+@discord.default_permissions(moderate_members=True)
+async def mute(ctx, member: discord.Member, time: int, reason: str):
+    await ctx.respond(f"🔍 I'm trying to mute <@{member.id}>...")
+    await member.timeout_for(timedelta(minutes=time), reason=reason)
+    await ctx.respond(f"✅ All good, <@{member.id}> has been muted by *{ctx.author.name}*, because: *{reason}*")
+
+@moderation.command(name="unmute", description="unmute someone in the chat")
+@discord.option("member", discord.Member, description="choose the number you want to unmute", required=True)
+@discord.option("reason", str, description="why do you want to unmute this member", default="No reason given")
+@discord.default_permissions(moderate_members=True)
+async def unmute(ctx, member: discord.Member, reason: str):
+    await ctx.respond(f"🔍 I'm trying to unmute <@{member.id}>...")
+    await member.remove_timeout()
+    await ctx.respond(f"✅ All good, <@{member.id}> has been unmuted by *{ctx.author.name}*, because: *{reason}*")
+
+@moderation.command(name="delete", description="delete x number of messages the actual channel")
+@discord.option("number", int, description="how many messages you want to delete")
+@discord.default_permissions(manage_messages=True)
+async def delete(ctx, number: int):
+    await ctx.respond(f"🔍 I'm trying to clear this channel of {number} messages...")
+    await ctx.channel.purge(limit=number+1)
+    await ctx.respond(f"✅ All good, {number} messages has been deleted here <@{ctx.author.id}>", ephemeral=True)
+
 
 
 
