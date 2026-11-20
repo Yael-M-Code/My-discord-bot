@@ -6,7 +6,6 @@ load_dotenv("token.env") # load all the variables from the env file
 bot = discord.Bot(intents=discord.Intents.all())
 token = os.getenv("TOKEN")
 
-
 # Command Part
 
 @bot.slash_command(name ="presentation", description="Present who I am and what's my purpose")
@@ -18,6 +17,16 @@ async def presentation(ctx):
     embed.set_footer(text="If you are reading that, I hope you will pass a great day")
     await ctx.respond(embed=embed)
 
+
+moderation = bot.create_group("moderation", "All commands to moderate your server")
+@moderation.command(name="ban", description="Ban a member, THIS ACTION IS IMPORTANT, to unban: /unban")
+@discord.option("member", discord.Member, description="The person who will be banned", required=True)
+@discord.option("reason", str, description="Explain why youu want to ban this user", default="No reason given")
+@discord.default_permissions(ban_members=True)
+async def ban(ctx, member: discord.Member, reason: str):
+    await ctx.respond(f"🔍 I'm trying to ban *{member}*")
+    await member.ban(reason=reason)
+    await ctx.respond(f"✅ All good, **{member}** is banned")
 
 
 # Event Part
