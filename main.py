@@ -22,6 +22,7 @@ async def presentation(ctx):
 async def ban_log(ctx):
     await ctx.respond(banlog)
 
+
 moderation = bot.create_group("moderation", "All commands to moderate your server")
 @moderation.command(name="ban", description="Ban a member, THIS ACTION IS IMPORTANT")
 @discord.option("member", discord.Member, description="The person who will be banned", required=True)
@@ -30,12 +31,14 @@ moderation = bot.create_group("moderation", "All commands to moderate your serve
 async def ban(ctx, member: discord.Member, reason: str):
     await ctx.respond(f"🔍 I'm trying to ban *{member}* with this id: `{member.id}`")
     await member.ban(reason=reason)
-    await ctx.respond(f"✅ All good, **{member}** is banned")
+    await ctx.respond(f"✅ All good, **{member}** is banned by *{ctx.author}*, because: {reason}")
     banlog[member.id] = {
         "name": str(member),
         "reason": reason,
         "moderator": str(ctx.author),
     }
+
+
 @moderation.command(name="unban", description="Unban a member")
 @discord.option("member_id", str, description="The id of the account that need to be UNBAN", required=True,)
 @discord.option("reason", str, description="Why you want to UNBAN?", default="No reason given")
@@ -44,11 +47,19 @@ async def unban(ctx, member_id: str, reason: str):
         user = discord.Object(id=int(member_id))
         await ctx.respond("🔍 Searching the user to unban")
         await ctx.guild.unban(user, reason=reason)
-        await ctx.respond(f"✅ All good, <@{member_id}> is unban, because: {reason}")
+        await ctx.respond(f"✅ All good, <@{member_id}> is unban by *{ctx.author}*, because: {reason}")
     except ValueError:
         await ctx.respond("❌ This is not a valid ID, it must only contain numbers. You can find the id with /ban_log")
     except discord.NotFound:
         await ctx.respond("❌ This user is not banned.")
+
+@moderation.command(name="kick", description="kick the member out of the server")
+@discord.option("member", discord.Member, description="id of the member you want to kick", required=True)
+@discord.option("reason", str, description="why you want to kick him?", default="No reason given")
+async def kick(ctx, member: discord.Member, reason: str):
+    await ctx.respond(f"🔍 I'm trying to kick <@{member.id}>")
+    await member.kick(reason=reason)
+    await ctx.respond(f"✅ All good, **{member}** has been kicked out by *{ctx.author}* because: *{reason}*")
 
 
 
