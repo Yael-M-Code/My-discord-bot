@@ -1,46 +1,41 @@
-# 🤖 The Ring Discord Moderation & Info Bot
+# The Ring Discord bot
 
-A small multipurpose Discord bot built in Python using [Pycord](https://pycord.dev). Designed as a learning project to improve my Python, this bot provides essential server moderation tools and user/server information utilities.
+This is a small Discord bot using Python and Pycord library. The purpose of this project was to improve my python, it provides essentials moderation / informations commands
 
-## ✨ Features
+Here is the link to [use it](https://discord.com/oauth2/authorize?client_id=1573044252684849242&permissions=8&integration_type=0&scope=bot+applications.commands)
 
-- **Slash Commands**: Fully integrated with Discord's modern slash command UI and command groups (`/moderation` and `/info`).
-- **Server Moderation**: Ban, unban, kick, timeout (mute/unmute), and delete messages with built-in Discord permission checks.
-- **Server & User Insights**: Inspect user avatars, account creation dates, roles, bot latency, and detailed server statistics.
+## Features
 
-## 📜 Commands
+- Slash Commands: Every commands use `/` prefix, so you can enjoy the discord UI
+- Moderation: (un)Mute, (un)Ban, kick nad even more...
+- Server / User infos: Display avatar, roles, bot's ping, server statistics...
 
-### General
+## Commands
 
-| Command | Description |
-| :--- | :--- |
-| `/presentation` | Displays an embed introducing the bot, its purpose, and its creator. |
-| `/ban_log` | Displays the log of users banned during the current session. |
+### `/moderation`
+-`/moderation ban`: Ban someone and record this action in ban_log (check warning)
+-`/moderation unban`: Unban someone, you need his ID, for that check /ban_log
+-`/moderation mute`: Mute someone for x minutes 
+-`/moderation unmute`: Unmute someone
+-`/moderation kick`: Remove a user from your server
+-`/moderation delete`: Delete the number of messages you choose (message for more than 2 weeks wouldn't delete)
 
-### Moderation (`/moderation`)
+### `/info`
+-`/info avatar`: Display the avatar of the person you choose (by default you)
+-`/info user`: Display some infos (likeID, creation date..) of the person you choose (by default you)
+-`/info pong`: Display bot's latency in ms
+-`/info server`: Display some infos about the server you're in (owner, creation date, ID....)
 
-| Command | Options | Required Permission | Description |
-| :--- | :--- | :--- | :--- |
-| `/moderation ban` | `member`, `[reason]` | Ban Members | Bans a member from the server and records it in the ban log. |
-| `/moderation unban` | `member_id`, `[reason]` | Ban Members | Unbans a user using their numeric Discord ID. |
-| `/moderation kick` | `member`, `[reason]` | Kick Members | Kicks a member from the server. |
-| `/moderation mute` | `member`, `time`, `[reason]` | Moderate Members | Times out a member for a specified duration (in minutes). |
-| `/moderation unmute` | `member`, `[reason]` | Moderate Members | Removes an active timeout from a member. |
-| `/moderation delete` | `number` | Manage Messages | Bulk-deletes a specified number of messages in the current channel. |
 
-### Information (`/info`)
+### Other
+-`presentation`: An embed about some cool infos of the bot
+-`ban_log`: Shows the log of all users banned.
 
-| Command | Options | Description |
-| :--- | :--- | :--- |
-| `/info avatar` | `[member]` | Displays your avatar or another member's avatar. |
-| `/info pong` | *None* | Checks and displays the bot's current latency in milliseconds. |
-| `/info server` | *None* | Displays server details (owner, creation date, ID, human/bot count, and channels). |
-| `/info user` | `[member]` | Displays user details (ID, bot status, account creation date, and roles). |
+> [!WARNING]
+> The command using banlog is been reset each time the bot crash.
 
-## ⚠️ Notes
+> [!NOTE]
+> The bot isn't host because I wait my HackClub verification in order to acces HackClub Nest
 
-- **Temporary Ban Log**: The `banlog` dictionary stores data in memory. Restarting the bot will reset the ban log.
-
-## 🙌 Acknowledgments
-
-Built with ❤️ while learning Python and exploring bot development with **Hack Club**, this project is for *Crossroads* program.
+## Extra
+Thank you to use my bot at least one time hehe, it was really fun to build (and faster than I thought). My Python level is really different since the beginning of this project. Also it helps me learn basic for every project (remind me git, readme, .env file...)
