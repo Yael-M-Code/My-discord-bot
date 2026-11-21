@@ -37,5 +37,7 @@ Here is the link to [use it](https://discord.com/oauth2/authorize?client_id=1573
 > [!NOTE]
 > The bot isn't host because I wait my HackClub verification in order to acces HackClub Nest
 
+If you want to try it yourself: install library from `requirements.txt`, after that run your main.py with python3 main.py (the bot should work like that locally) 
+
 ## Extra
 Thank you to use my bot at least one time hehe, it was really fun to build (and faster than I thought). My Python level is really different since the beginning of this project. Also it helps me learn basic for every project (remind me git, readme, .env file...)
